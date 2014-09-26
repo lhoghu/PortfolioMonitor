@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Portfolio Monitor</string>
+    <string name="welcome_splash">Welcome to the Portfolio Monitor</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <string name="title_activity_search_symbol">SearchSymbolActivity</string>
+    <string name="symbol_search">Enter symbol</string>
+    <string name="button_search">Search</string>
+    <string name="ok">OK</string>
+    <string name="sim_behaviour_dialog">Pretending to perform action:</string>
+
+</resources>
