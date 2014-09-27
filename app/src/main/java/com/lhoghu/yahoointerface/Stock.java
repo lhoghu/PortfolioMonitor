@@ -13,6 +13,11 @@ public class Stock {
         this.price = price;
     }
 
+    @Override
+    public String toString(){
+        return name + "(" + symbol + "): " + price;
+    }
+
     public String toXml(){
         return "<stock><symbol>" + symbol +
                 "</symbol><name><![CDATA[" +

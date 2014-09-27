@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class YahooServlet {
+
+    private static final String baseQuoteUrl = "http://finance.yahoo.com/d/quotes.csv?f=sb2n&s=";
+
 //    public void doGet(HttpServletRequest request,
 //                      HttpServletResponse response) throws IOException {
 //        String[] symbols = request.getParameterValues("stock");
@@ -43,9 +46,11 @@ public class YahooServlet {
             sb.append('+');
         }
         sb.deleteCharAt(sb.length() - 1);
-        String urlStr =
-                "http://finance.yahoo.com/d/quotes.csv?f=sb2n&s=" +
-                        sb.toString();
+        // The f=sb2n part defines set the info we'd like back from yahoo
+        // Check http://www.jarloo.com/yahoo_finance/ for a list of alternatives
+        // TODO: work the list of alternatives into the request
+        // TODO: successfully retrieve indices (^FTSE)
+        String urlStr = baseQuoteUrl + sb.toString();
         URL url = new URL(urlStr);
         HttpURLConnection conn =
                 (HttpURLConnection) url.openConnection();
