@@ -1,36 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/LinearLayout01"
+<LinearLayout
+    android:id="@+id/portfolio"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
-        android:id="@+id/symbol_search_result"
+        android:id="@+id/portfolio_symbol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
-        android:textColor="#ffaf6c00">
+        android:textColor="#ff000000">
     </TextView>
     <TextView
-        android:id="@+id/symbol_search_name"
+        android:id="@+id/portfolio_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
-        android:textColor="#ffaf6c00">
+        android:textColor="#ff75797b">
     </TextView>
     <TextView
-        android:id="@+id/symbol_search_price"
+        android:id="@+id/portfolio_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
-        android:textColor="#ffaf6c00">
+        android:textColor="#ff39df00">
     </TextView>
-    <Button android:text="Add"
-        android:id="@+id/button_add_symbol"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="buttonAddSymbolHandler">
-    </Button>
 
 </LinearLayout>

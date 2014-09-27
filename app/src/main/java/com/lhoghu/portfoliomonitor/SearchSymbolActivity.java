@@ -1,16 +1,23 @@
 package com.lhoghu.portfoliomonitor;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lhoghu.yahoointerface.Stock;
 
@@ -43,7 +50,6 @@ public class SearchSymbolActivity extends Activity {
         });
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -61,6 +67,71 @@ public class SearchSymbolActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Handler for a button click event within each listview element.
+     * On click, the symbol should be saved to the portfolio db
+     */
+    public void buttonAddSymbolHandler(View view)
+    {
+        // Get the row the button is clicked in
+        LinearLayout parentRow = (LinearLayout) view.getParent();
+
+        TextView symbol = (TextView) parentRow.getChildAt(0);
+        TextView name = (TextView) parentRow.getChildAt(1);
+//        TextView price = (TextView) parentRow.getChildAt(2);
+//        Button addButton = (Button) parentRow.getChildAt(3);
+
+        PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
+        dbAdapter.open();
+        dbAdapter.addSymbol(symbol.toString(), name.toString(), 0);
+        dbAdapter.close();
+    }
+
+    /**
+     * Class to populate symbol search results in a list view
+     */
+    public class StockAdapter extends ArrayAdapter<Stock> {
+
+        private Stock[] stocks;
+
+        public StockAdapter(Context context, int textViewResourceId, Stock[] stocks) {
+            super(context, textViewResourceId, stocks);
+            this.stocks = stocks;
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent){
+
+            // Check to see if the view is null. If so, we have to inflate it.
+            // To inflate it means to render, or show, the view.
+            if (view == null) {
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.stock, null);
+            }
+
+            Stock stock = stocks[position];
+
+            if (stock != null) {
+                TextView symbol = (TextView) view.findViewById(R.id.symbol_search_result);
+                TextView name   = (TextView) view.findViewById(R.id.symbol_search_name);
+                TextView price  = (TextView) view.findViewById(R.id.symbol_search_price);
+
+                if (symbol != null) {
+                    symbol.setText(stock.symbol);
+                }
+                if (name != null) {
+                    name.setText(stock.name);
+                }
+                if (price != null) {
+                    price.setText(String.valueOf(stock.price));
+                }
+            }
+
+            return view;
+        }
+
     }
 
     private class YahooParser extends AsyncTask<String, Integer, Stock[]> {
@@ -99,12 +170,13 @@ public class SearchSymbolActivity extends Activity {
         @Override
         protected void onProgressUpdate(Integer... progress) {
             //setProgressPercent(progress[0]);
+            // TODO: Toast update popup while user waits for http request
         }
 
         @Override
         protected void onPostExecute(Stock[] stocks) {
-            ArrayAdapter<Stock> adapter =
-                    new ArrayAdapter<Stock>(SearchSymbolActivity.this, R.layout.stock, stocks);
+            StockAdapter adapter =
+                    new StockAdapter(SearchSymbolActivity.this, R.layout.stock, stocks);
 
             ListView listView = (ListView) findViewById(R.id.symbol_list);
             listView.setAdapter(adapter);

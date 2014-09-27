@@ -6,11 +6,20 @@ public class Stock {
     public final String symbol;
     public final String name;
     public final double price;
+    public final double position;
 
     public Stock(String symbol, String name, double price) {
         this.symbol = symbol;
         this.name = name;
         this.price = price;
+        this.position = 0.0;
+    }
+
+    public Stock(String symbol, String name, double price, double position) {
+        this.symbol = symbol;
+        this.name = name;
+        this.price = price;
+        this.position = position;
     }
 
     @Override

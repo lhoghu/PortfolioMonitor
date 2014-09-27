@@ -1,10 +1,20 @@
 package com.lhoghu.portfoliomonitor;
 
 import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Intent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.lhoghu.yahoointerface.Stock;
 
 public class PortfolioActivity extends Activity {
 
@@ -12,6 +22,19 @@ public class PortfolioActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_portfolio);
+
+        // Draw the list view
+        PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
+        dbAdapter.open();
+        Cursor c = dbAdapter.fetchAllTrades();
+        Stock[] stocks = PortfolioDbAdapter.cursorToStockArray(c);
+        c.close();
+
+        PortfolioAdapter adapter =
+                new PortfolioAdapter(this, R.layout.portfolio, stocks);
+
+        ListView listView = (ListView) findViewById(R.id.portfolio);
+        listView.setAdapter(adapter);
     }
 
 
@@ -42,4 +65,49 @@ public class PortfolioActivity extends Activity {
         Intent intent = new Intent(this, SearchSymbolActivity.class);
         startActivity(intent);
     }
+
+    /**
+     * Class to populate symbol search results in a list view
+     */
+    public class PortfolioAdapter extends ArrayAdapter<Stock> {
+
+        private Stock[] stocks;
+
+        public PortfolioAdapter(Context context, int textViewResourceId, Stock[] stocks) {
+            super(context, textViewResourceId, stocks);
+            this.stocks = stocks;
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent){
+
+            // Check to see if the view is null. If so, we have to inflate it.
+            // To inflate it means to render, or show, the view.
+            if (view == null) {
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.portfolio, null);
+            }
+
+            Stock stock = stocks[position];
+
+            if (stock != null) {
+                TextView symbol     = (TextView) view.findViewById(R.id.portfolio_symbol);
+                TextView name       = (TextView) view.findViewById(R.id.portfolio_name);
+                TextView holding   = (TextView) view.findViewById(R.id.portfolio_position);
+
+                if (symbol != null) {
+                    symbol.setText(stock.symbol);
+                }
+                if (name != null) {
+                    name.setText(stock.name);
+                }
+                if (holding != null) {
+                    holding.setText(String.valueOf(stock.position));
+                }
+            }
+
+            return view;
+        }
+    }
+
 }
