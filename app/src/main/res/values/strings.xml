@@ -15,5 +15,6 @@
     <string name="portfolio_position">Position</string>
     <string name="sim_behaviour_dialog">Pretending to perform action:</string>
     <string name="yahoo_download_dialog">Downloading from Yahoo</string>
+    <string name="position_hint">Enter position</string>
 
 </resources>

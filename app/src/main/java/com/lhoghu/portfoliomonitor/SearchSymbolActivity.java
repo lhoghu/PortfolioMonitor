@@ -75,35 +75,66 @@ public class SearchSymbolActivity extends Activity {
 
     /**
      * Handler for a button click event within each listview element.
-     * On click, the symbol should be saved to the portfolio db
+     * On click, a dialog window should appear that requests user information
+     * (position, currency, ...) before the symbol is saved to the portfolio db
      */
     public void buttonAddSymbolHandler(View view)
     {
-        // Get the row the button is clicked in
-        LinearLayout parentRow = (LinearLayout) view.getParent();
+        LayoutInflater li = LayoutInflater.from(this);
+        View dialogView = li.inflate(R.layout.add_symbol_dialog, null);
 
-        TextView symbol = (TextView) parentRow.getChildAt(0);
-        TextView name = (TextView) parentRow.getChildAt(1);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setView(dialogView);
 
-        // TODO: create a popup for the user to enter the trade position
-        PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
-        dbAdapter.open();
-        long success = dbAdapter.addSymbol(
-                symbol.getText().toString(),
-                name.getText().toString(),
-                0);
-        dbAdapter.close();
+        final EditText userInput = (EditText) dialogView.findViewById(R.id.position_user_input);
+        final View v = view;
+        final Context context = this;
 
-        if (success == -1)
-            Toast.makeText(
-                    getApplicationContext(),
-                    "Failed to add " + symbol.getText().toString() + " to portfolio",
-                    Toast.LENGTH_SHORT).show();
-        else
-            Toast.makeText(
-                    getApplicationContext(),
-                    "Added " + symbol.getText().toString() + " to portfolio",
-                    Toast.LENGTH_SHORT).show();
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                // get user input and set it to result
+                                // edit text
+                                // Get the row the button is clicked in
+                                LinearLayout parentRow = (LinearLayout) v.getParent();
+
+                                TextView symbol = (TextView) parentRow.getChildAt(0);
+                                TextView name = (TextView) parentRow.getChildAt(1);
+
+                                int position = Long.valueOf(userInput.getText().toString()).intValue();
+
+                                PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(context);
+                                dbAdapter.open();
+                                long success = dbAdapter.addSymbol(
+                                        symbol.getText().toString(),
+                                        name.getText().toString(),
+                                        position);
+                                dbAdapter.close();
+
+                                if (success == -1)
+                                    Toast.makeText(
+                                            getApplicationContext(),
+                                            "Failed to add " + symbol.getText().toString() + " to portfolio",
+                                            Toast.LENGTH_SHORT).show();
+                                else
+                                    Toast.makeText(
+                                            getApplicationContext(),
+                                            "Added " + symbol.getText().toString() + " to portfolio",
+                                            Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     /**
@@ -191,7 +222,7 @@ public class SearchSymbolActivity extends Activity {
 
         @Override
         protected  void onPreExecute() {
-            pd = ProgressDialog.show(SearchSymbolActivity.this, "Please wait", "Loading please wait..", true);
+            pd = ProgressDialog.show(SearchSymbolActivity.this, "Please wait", "Downloading from Yahoo...", true);
         }
 
         @Override
@@ -221,27 +252,6 @@ public class SearchSymbolActivity extends Activity {
 
             HttpResponse response = client.execute(request);
             return response.getEntity().getContent();
-        }
-    }
-
-    public class YahooDownloadDialogFragment extends DialogFragment {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage(R.string.yahoo_download_dialog);
-//                    .setPositiveButton(R.string.fire, new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            // FIRE ZE MISSILES!
-//                        }
-//                    })
-//                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            // User cancelled the dialog
-//                        }
-//                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
         }
     }
 }
