@@ -120,9 +120,9 @@ public class PortfolioDbAdapter {
                 null, null, null, null, null);
     }
 
-    private static String getStringFromCursor(Cursor c, String columnName) {
-        return c.getString(c.getColumnIndex(columnName));
-    }
+//    private static String getStringFromCursor(Cursor c, String columnName) {
+//        return c.getString(c.getColumnIndex(columnName));
+//    }
 
     public static Stock[] cursorToStockArray (Cursor cursor)
     {
@@ -130,10 +130,11 @@ public class PortfolioDbAdapter {
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
+            long id         = cursor.getLong(cursor.getColumnIndex(PortfolioDbContract.Trade._ID));
             String symbol   = cursor.getString(cursor.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL));
             String name     = cursor.getString(cursor.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_NAME));
             double position = cursor.getDouble(cursor.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_POSITION));
-            stocks[cursor.getPosition()] = new Stock(symbol, name, 0.0, position);
+            stocks[cursor.getPosition()] = new Stock(symbol, name, 0.0, position, id);
             cursor.moveToNext();
         }
 
@@ -185,5 +186,14 @@ public class PortfolioDbAdapter {
                 args,
                 PortfolioDbContract.Trade._ID + "=" + rowId,
                 null) > 0;
+    }
+
+    /**
+     * Remove all trades from a portfolio
+     *
+     * @return true if the trade was successfully updated, false otherwise
+     */
+    public boolean deleteAllTrades() {
+        return mDb.delete(PortfolioDbContract.Trade.TABLE_NAME, null, null) > 0;
     }
 }

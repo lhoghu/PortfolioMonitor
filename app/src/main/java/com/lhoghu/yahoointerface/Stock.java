@@ -7,12 +7,14 @@ public class Stock {
     public final String name;
     public final double price;
     public final double position;
+    public final long id;
 
     public Stock(String symbol, String name, double price) {
         this.symbol = symbol;
         this.name = name;
         this.price = price;
         this.position = 0.0;
+        this.id = 0;
     }
 
     public Stock(String symbol, String name, double price, double position) {
@@ -20,6 +22,15 @@ public class Stock {
         this.name = name;
         this.price = price;
         this.position = position;
+        this.id = 0;
+    }
+
+    public Stock(String symbol, String name, double price, double position, long id) {
+        this.symbol = symbol;
+        this.name = name;
+        this.price = price;
+        this.position = position;
+        this.id = id;
     }
 
     @Override

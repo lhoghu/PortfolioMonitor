@@ -11,12 +11,17 @@ import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.lhoghu.yahoointerface.Stock;
 
 public class PortfolioActivity extends Activity {
+
+    private SimpleCursorAdapter portfolioAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,16 +32,43 @@ public class PortfolioActivity extends Activity {
         PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
         dbAdapter.open();
         Cursor c = dbAdapter.fetchAllTrades();
-        Stock[] stocks = PortfolioDbAdapter.cursorToStockArray(c);
-        c.close();
 
-        PortfolioAdapter adapter =
-                new PortfolioAdapter(this, R.layout.portfolio, stocks);
+        String[] dbCols = new String[] {
+                PortfolioDbContract.Trade._ID,
+                PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL,
+                PortfolioDbContract.Trade.COLUMN_NAME_NAME,
+                PortfolioDbContract.Trade.COLUMN_NAME_POSITION
+        };
 
+        int[] layoutCols = new int[] {
+                R.id.portfolio_id,
+                R.id.portfolio_symbol,
+                R.id.portfolio_name,
+                R.id.portfolio_position
+        };
+
+        portfolioAdapter = new SimpleCursorAdapter(this, R.layout.portfolio, c, dbCols, layoutCols, 0);
         ListView listView = (ListView) findViewById(R.id.portfolio);
-        listView.setAdapter(adapter);
-    }
+        listView.setAdapter(portfolioAdapter);
 
+        // Might be better way of handling deletes/updates/detailed view...
+//        listView.setOnItemClickListener(new OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> listView, View view,
+//                                    int position, long id) {
+//                // Get the cursor, positioned to the corresponding row in the result set
+//                Cursor cursor = (Cursor) listView.getItemAtPosition(position);
+//
+//                // Get the state's capital from this row in the database.
+//                String countryCode =
+//                        cursor.getString(cursor.getColumnIndexOrThrow("code"));
+//                Toast.makeText(getApplicationContext(),
+//                        countryCode, Toast.LENGTH_SHORT).show();
+//
+//            }
+//        });
+        //dbAdapter.close();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -67,47 +99,36 @@ public class PortfolioActivity extends Activity {
     }
 
     /**
-     * Class to populate symbol search results in a list view
+     * Handler for a button click event within each listview element.
+     * On click, the trade is removed from the portfolio db
      */
-    public class PortfolioAdapter extends ArrayAdapter<Stock> {
+    public void buttonEditTradeHandler(View view)
+    {
+        // Get the row the button is clicked in
+        LinearLayout parentRow = (LinearLayout) view.getParent();
 
-        private Stock[] stocks;
+        TextView id = (TextView) parentRow.getChildAt(0);
 
-        public PortfolioAdapter(Context context, int textViewResourceId, Stock[] stocks) {
-            super(context, textViewResourceId, stocks);
-            this.stocks = stocks;
-        }
+        PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
+        dbAdapter.open();
+        dbAdapter.deleteEntry(Long.valueOf(id.getText().toString()));
 
-        @Override
-        public View getView(int position, View view, ViewGroup parent){
-
-            // Check to see if the view is null. If so, we have to inflate it.
-            // To inflate it means to render, or show, the view.
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.portfolio, null);
-            }
-
-            Stock stock = stocks[position];
-
-            if (stock != null) {
-                TextView symbol     = (TextView) view.findViewById(R.id.portfolio_symbol);
-                TextView name       = (TextView) view.findViewById(R.id.portfolio_name);
-                TextView holding   = (TextView) view.findViewById(R.id.portfolio_position);
-
-                if (symbol != null) {
-                    symbol.setText(stock.symbol);
-                }
-                if (name != null) {
-                    name.setText(stock.name);
-                }
-                if (holding != null) {
-                    holding.setText(String.valueOf(stock.position));
-                }
-            }
-
-            return view;
-        }
+        Cursor c = dbAdapter.fetchAllTrades();
+        portfolioAdapter.changeCursor(c);
+        dbAdapter.close();
     }
 
+    /**
+     * Handler to remove all trades from a portfolio
+     */
+    public void buttonClearAllTradesHandler(View view)
+    {
+        PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
+        dbAdapter.open();
+        dbAdapter.deleteAllTrades();
+
+        Cursor c = dbAdapter.fetchAllTrades();
+        portfolioAdapter.changeCursor(c);
+        dbAdapter.close();
+    }
 }

@@ -10,14 +10,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lhoghu.yahoointerface.Stock;
 
@@ -80,12 +78,14 @@ public class SearchSymbolActivity extends Activity {
 
         TextView symbol = (TextView) parentRow.getChildAt(0);
         TextView name = (TextView) parentRow.getChildAt(1);
-//        TextView price = (TextView) parentRow.getChildAt(2);
-//        Button addButton = (Button) parentRow.getChildAt(3);
 
+        // TODO: create a popup for the user to enter the trade position
         PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
         dbAdapter.open();
-        dbAdapter.addSymbol(symbol.toString(), name.toString(), 0);
+        dbAdapter.addSymbol(
+                symbol.getText().toString(),
+                name.getText().toString(),
+                0);
         dbAdapter.close();
     }
 
