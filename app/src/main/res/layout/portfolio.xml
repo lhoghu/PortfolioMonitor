@@ -8,35 +8,40 @@
 
     <TextView
         android:id="@+id/portfolio_id"
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
         android:textColor="#ff000000">
     </TextView>
     <TextView
         android:id="@+id/portfolio_symbol"
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
         android:textColor="#ff000000">
     </TextView>
     <TextView
         android:id="@+id/portfolio_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
         android:textColor="#ff75797b">
     </TextView>
     <TextView
         android:id="@+id/portfolio_position"
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
         android:textColor="#ff39df00">
     </TextView>
     <Button android:text="Remove"
         android:id="@+id/button_edit_trade"
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:onClick="buttonEditTradeHandler">
     </Button>

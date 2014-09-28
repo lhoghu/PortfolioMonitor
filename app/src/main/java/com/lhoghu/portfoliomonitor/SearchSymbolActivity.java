@@ -2,8 +2,6 @@ package com.lhoghu.portfoliomonitor;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -96,8 +94,6 @@ public class SearchSymbolActivity extends Activity {
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
-                                // get user input and set it to result
-                                // edit text
                                 // Get the row the button is clicked in
                                 LinearLayout parentRow = (LinearLayout) v.getParent();
 
@@ -182,6 +178,10 @@ public class SearchSymbolActivity extends Activity {
 
     }
 
+    private static String stripQuotes (String str) {
+        return str.replaceAll("^\"|\"$", "");
+    }
+
     private class YahooParser extends AsyncTask<String, Integer, Stock[]> {
 
         private static final String baseQuoteUrl = "http://finance.yahoo.com/d/quotes.csv?f=sb2n&s=";
@@ -200,8 +200,8 @@ public class SearchSymbolActivity extends Activity {
                 while (line != null){
                     String[] values = line.split(",");
                     Stock stock = new Stock(
-                            values[0],
-                            values[2],
+                            stripQuotes(values[0]),
+                            stripQuotes(values[2]),
                             Double.parseDouble(values[1]));
                     stocks.add(stock);
                     line = reader.readLine();
