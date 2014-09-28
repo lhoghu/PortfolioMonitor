@@ -3,14 +3,16 @@ package com.lhoghu.portfoliomonitor;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.content.Intent;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
+import android.widget.Toast;
 
 public class PortfolioActivity extends Activity {
 
@@ -27,14 +29,12 @@ public class PortfolioActivity extends Activity {
         Cursor c = dbAdapter.fetchAllTrades();
 
         String[] dbCols = new String[] {
-                PortfolioDbContract.Trade._ID,
                 PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL,
                 PortfolioDbContract.Trade.COLUMN_NAME_NAME,
                 PortfolioDbContract.Trade.COLUMN_NAME_POSITION
         };
 
         int[] layoutCols = new int[] {
-                R.id.portfolio_id,
                 R.id.portfolio_symbol,
                 R.id.portfolio_name,
                 R.id.portfolio_position
@@ -47,24 +47,46 @@ public class PortfolioActivity extends Activity {
 
         portfolioAdapter = new SimpleCursorAdapter(this, R.layout.portfolio, c, dbCols, layoutCols, 0);
         listView.setAdapter(portfolioAdapter);
+        registerForContextMenu(listView);
 
-        // Might be better way of handling deletes/updates/detailed view...
-//        listView.setOnItemClickListener(new OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> listView, View view,
-//                                    int position, long id) {
-//                // Get the cursor, positioned to the corresponding row in the result set
-//                Cursor cursor = (Cursor) listView.getItemAtPosition(position);
-//
-//                // Get the state's capital from this row in the database.
-//                String countryCode =
-//                        cursor.getString(cursor.getColumnIndexOrThrow("code"));
-//                Toast.makeText(getApplicationContext(),
-//                        countryCode, Toast.LENGTH_SHORT).show();
-//
-//            }
-//        });
         //dbAdapter.close();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId() == R.id.portfolio) {
+            super.onCreateContextMenu(menu, v, menuInfo);
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.portfolio_context, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.portfolio_item_edit:
+                // pass info.id to a method that edits the item
+                Toast.makeText(this, "Pretend to edit item", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.portfolio_item_details:
+                Toast.makeText(this, "Pretend to show item detail", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.portfolio_item_delete:
+                Cursor c = portfolioAdapter.getCursor();
+                c.moveToPosition(info.position-1);
+                long tradeId = c.getLong(c.getColumnIndex(PortfolioDbContract.Trade._ID));
+                PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
+                dbAdapter.open();
+                dbAdapter.deleteEntry(tradeId);
+                Cursor newCursor = dbAdapter.fetchAllTrades();
+                portfolioAdapter.changeCursor(newCursor);
+                dbAdapter.close();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     @Override
@@ -93,39 +115,5 @@ public class PortfolioActivity extends Activity {
     void openSearchActivity() {
         Intent intent = new Intent(this, SearchSymbolActivity.class);
         startActivity(intent);
-    }
-
-    /**
-     * Handler for a button click event within each listview element.
-     * On click, the trade is removed from the portfolio db
-     */
-    public void buttonEditTradeHandler(View view)
-    {
-        // Get the row the button is clicked in
-        LinearLayout parentRow = (LinearLayout) view.getParent();
-
-        TextView id = (TextView) parentRow.getChildAt(0);
-
-        PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
-        dbAdapter.open();
-        dbAdapter.deleteEntry(Long.valueOf(id.getText().toString()));
-
-        Cursor c = dbAdapter.fetchAllTrades();
-        portfolioAdapter.changeCursor(c);
-        dbAdapter.close();
-    }
-
-    /**
-     * Handler to remove all trades from a portfolio
-     */
-    public void buttonClearAllTradesHandler(View view)
-    {
-        PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
-        dbAdapter.open();
-        dbAdapter.deleteAllTrades();
-
-        Cursor c = dbAdapter.fetchAllTrades();
-        portfolioAdapter.changeCursor(c);
-        dbAdapter.close();
     }
 }

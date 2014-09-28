@@ -7,15 +7,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
-        android:id="@+id/portfolio_id_header"
-        android:text="@string/portfolio_id"
-        android:layout_width="0dip"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dip"
-        android:textColor="#ff000000">
-    </TextView>
-    <TextView
         android:id="@+id/portfolio_symbol_header"
         android:text="@string/portfolio_symbol"
         android:layout_width="0dip"
@@ -42,14 +33,5 @@
         android:layout_margin="5dip"
         android:textColor="#ff000000">
     </TextView>
-    <Button
-        android:text="Clear all"
-        android:id="@+id/button_clear_all_trades"
-        android:layout_width="0dip"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:onClick="buttonClearAllTradesHandler">
-
-    </Button>
 
 </LinearLayout>
