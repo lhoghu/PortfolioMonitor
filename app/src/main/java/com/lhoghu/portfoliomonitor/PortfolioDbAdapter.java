@@ -7,8 +7,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.lhoghu.yahoointerface.Stock;
-
 public class PortfolioDbAdapter {
 
     private PortfolioDbHelper mDbHelper;
@@ -118,27 +116,6 @@ public class PortfolioDbAdapter {
                         PortfolioDbContract.Trade._ID
                 },
                 null, null, null, null, null);
-    }
-
-//    private static String getStringFromCursor(Cursor c, String columnName) {
-//        return c.getString(c.getColumnIndex(columnName));
-//    }
-
-    public static Stock[] cursorToStockArray (Cursor cursor)
-    {
-        Stock[] stocks = new Stock[cursor.getCount()];
-
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            long id         = cursor.getLong(cursor.getColumnIndex(PortfolioDbContract.Trade._ID));
-            String symbol   = cursor.getString(cursor.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL));
-            String name     = cursor.getString(cursor.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_NAME));
-            double position = cursor.getDouble(cursor.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_POSITION));
-            stocks[cursor.getPosition()] = new Stock(symbol, name, 0.0, position, id);
-            cursor.moveToNext();
-        }
-
-        return stocks;
     }
 
     /**

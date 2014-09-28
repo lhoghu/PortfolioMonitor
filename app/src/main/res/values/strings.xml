@@ -9,6 +9,11 @@
     <string name="symbol_search">Enter symbol</string>
     <string name="button_search">Search</string>
     <string name="ok">OK</string>
+    <string name="portfolio_id">ID</string>
+    <string name="portfolio_symbol">Symbol</string>
+    <string name="portfolio_name">Name</string>
+    <string name="portfolio_position">Position</string>
     <string name="sim_behaviour_dialog">Pretending to perform action:</string>
+    <string name="yahoo_download_dialog">Downloading from Yahoo</string>
 
 </resources>

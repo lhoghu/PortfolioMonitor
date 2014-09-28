@@ -21,13 +21,4 @@
         android:layout_weight="1">
     </ListView>
 
-    <Button
-        android:text="Clear all"
-        android:id="@+id/button_clear_all_trades"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="buttonClearAllTradesHandler">
-
-    </Button>
-
 </LinearLayout>

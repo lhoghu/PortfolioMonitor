@@ -1,23 +1,16 @@
 package com.lhoghu.portfoliomonitor;
 
 import android.app.Activity;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Intent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-
-import com.lhoghu.yahoointerface.Stock;
 
 public class PortfolioActivity extends Activity {
 
@@ -47,8 +40,12 @@ public class PortfolioActivity extends Activity {
                 R.id.portfolio_position
         };
 
-        portfolioAdapter = new SimpleCursorAdapter(this, R.layout.portfolio, c, dbCols, layoutCols, 0);
         ListView listView = (ListView) findViewById(R.id.portfolio);
+
+        View header = getLayoutInflater().inflate(R.layout.portfolio_header, null);
+        listView.addHeaderView(header);
+
+        portfolioAdapter = new SimpleCursorAdapter(this, R.layout.portfolio, c, dbCols, layoutCols, 0);
         listView.setAdapter(portfolioAdapter);
 
         // Might be better way of handling deletes/updates/detailed view...

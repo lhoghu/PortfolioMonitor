@@ -1,7 +1,12 @@
 package com.lhoghu.portfoliomonitor;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +21,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lhoghu.yahoointerface.Stock;
 
@@ -82,11 +88,22 @@ public class SearchSymbolActivity extends Activity {
         // TODO: create a popup for the user to enter the trade position
         PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(this);
         dbAdapter.open();
-        dbAdapter.addSymbol(
+        long success = dbAdapter.addSymbol(
                 symbol.getText().toString(),
                 name.getText().toString(),
                 0);
         dbAdapter.close();
+
+        if (success == -1)
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Failed to add " + symbol.getText().toString() + " to portfolio",
+                    Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Added " + symbol.getText().toString() + " to portfolio",
+                    Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -137,6 +154,7 @@ public class SearchSymbolActivity extends Activity {
     private class YahooParser extends AsyncTask<String, Integer, Stock[]> {
 
         private static final String baseQuoteUrl = "http://finance.yahoo.com/d/quotes.csv?f=sb2n&s=";
+        private ProgressDialog pd;
 
         public YahooParser() {}
 
@@ -169,8 +187,11 @@ public class SearchSymbolActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
-            //setProgressPercent(progress[0]);
-            // TODO: Toast update popup while user waits for http request
+        }
+
+        @Override
+        protected  void onPreExecute() {
+            pd = ProgressDialog.show(SearchSymbolActivity.this, "Please wait", "Loading please wait..", true);
         }
 
         @Override
@@ -180,6 +201,9 @@ public class SearchSymbolActivity extends Activity {
 
             ListView listView = (ListView) findViewById(R.id.symbol_list);
             listView.setAdapter(adapter);
+
+            if (pd != null)
+                pd.dismiss();
         }
 
         private String makeUrlString(String... symbols) {
@@ -198,6 +222,26 @@ public class SearchSymbolActivity extends Activity {
             HttpResponse response = client.execute(request);
             return response.getEntity().getContent();
         }
+    }
 
+    public class YahooDownloadDialogFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage(R.string.yahoo_download_dialog);
+//                    .setPositiveButton(R.string.fire, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//                            // FIRE ZE MISSILES!
+//                        }
+//                    })
+//                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//                            // User cancelled the dialog
+//                        }
+//                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
     }
 }

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/portfolio_header"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/portfolio_id_header"
+        android:text="@string/portfolio_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff000000">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_symbol_header"
+        android:text="@string/portfolio_symbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff000000">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_name_header"
+        android:text="@string/portfolio_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff000000">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_position_header"
+        android:text="@string/portfolio_position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff000000">
+    </TextView>
+    <Button
+        android:text="Clear all"
+        android:id="@+id/button_clear_all_trades"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="buttonClearAllTradesHandler">
+
+    </Button>
+
+</LinearLayout>
