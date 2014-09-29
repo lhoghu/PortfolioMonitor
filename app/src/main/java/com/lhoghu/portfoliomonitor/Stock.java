@@ -17,25 +17,9 @@ public class Stock {
         this.id = 0;
     }
 
-    public Stock(String symbol, String name, double price, double position) {
-        this.symbol = symbol;
-        this.name = name;
-        this.price = price;
-        this.position = position;
-        this.id = 0;
-    }
-
-    public Stock(String symbol, String name, double price, double position, long id) {
-        this.symbol = symbol;
-        this.name = name;
-        this.price = price;
-        this.position = position;
-        this.id = id;
-    }
-
     @Override
     public String toString(){
-        return name + "(" + symbol + "): " + price;
+        return name + " (" + symbol + "): " + price;
     }
 
     public String toXml(){

@@ -12,7 +12,7 @@ public final class PortfolioDbContract {
     public static final String DATABASE_NAME = "Portfolio.db";
 
     private static final String TEXT_TYPE = " TEXT";
-    private static final String INT_TYPE = " REAL";
+    private static final String REAL_TYPE = " REAL";
     private static final String COMMA_SEP = ",";
 
     /* Inner class that defines the table contents */
@@ -21,13 +21,15 @@ public final class PortfolioDbContract {
         public static final String COLUMN_NAME_SYMBOL = "symbol";
         public static final String COLUMN_NAME_NAME = "name";
         public static final String COLUMN_NAME_POSITION = "position";
+        public static final String COLUMN_NAME_PRICE = "price";
 
         public static final String SQL_CREATE_ENTRIES =
-                "CREATE TABLE " + TABLE_NAME + " (" +
+                "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                         Trade._ID + " INTEGER PRIMARY KEY," +
                         Trade.COLUMN_NAME_SYMBOL + TEXT_TYPE + COMMA_SEP +
                         Trade.COLUMN_NAME_NAME + TEXT_TYPE + COMMA_SEP +
-                        Trade.COLUMN_NAME_POSITION + INT_TYPE +
+                        Trade.COLUMN_NAME_POSITION + REAL_TYPE + COMMA_SEP +
+                        Trade.COLUMN_NAME_PRICE + REAL_TYPE +
                         " )";
 
         public static final String SQL_DELETE_ENTRIES =

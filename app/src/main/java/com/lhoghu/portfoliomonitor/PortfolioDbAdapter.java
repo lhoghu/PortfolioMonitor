@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 
 public class PortfolioDbAdapter {
 
@@ -31,13 +33,45 @@ public class PortfolioDbAdapter {
             // This database stores user data on their holdings and positions
             // therefore we need to copy across anything stored in the previous version
             // of the db
-            // TODO: implement copy of existing data
+
+            Log.i("Portfolio Monitor", "Upgrading db from version " + String.valueOf(oldVersion));
+
+            /**
+             * Upgrade for version 1 to version 2
+             */
+            // Backup existing tables
+            db.execSQL(
+                    "ALTER TABLE " + PortfolioDbContract.Trade.TABLE_NAME +
+                            " RENAME TO " + backupName(PortfolioDbContract.Trade.TABLE_NAME) + ";");
+
+            // Create tables in new schema
             db.execSQL(PortfolioDbContract.Trade.SQL_DELETE_ENTRIES);
             onCreate(db);
+
+            // Transfer user defined data from backup to new
+            db.execSQL(
+                    "INSERT INTO " + PortfolioDbContract.Trade.TABLE_NAME + " (" +
+                            PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL + ", " +
+                            PortfolioDbContract.Trade.COLUMN_NAME_NAME + ", " +
+                            PortfolioDbContract.Trade.COLUMN_NAME_POSITION + ") " +
+
+                    "SELECT " +
+                            PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL + ", " +
+                            PortfolioDbContract.Trade.COLUMN_NAME_NAME + ", " +
+                            PortfolioDbContract.Trade.COLUMN_NAME_POSITION +
+                    " FROM " + backupName(PortfolioDbContract.Trade.TABLE_NAME) + ";"
+            );
+
+            // Remove the backup
+            db.execSQL("DROP TABLE " + backupName(PortfolioDbContract.Trade.TABLE_NAME) + ";");
         }
 
         public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             onUpgrade(db, oldVersion, newVersion);
+        }
+
+        private String backupName(String tableName) {
+            return tableName + "_backup";
         }
     }
 
@@ -109,13 +143,28 @@ public class PortfolioDbAdapter {
     public Cursor fetchAllTrades() {
         return mDb.query(
                 PortfolioDbContract.Trade.TABLE_NAME,
-                new String[] {
-                        PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL,
-                        PortfolioDbContract.Trade.COLUMN_NAME_NAME,
-                        PortfolioDbContract.Trade.COLUMN_NAME_POSITION,
-                        PortfolioDbContract.Trade._ID
-                },
+                null, // passing null gets back all columns - we want to use them all...
+//                new String[] {
+//                        PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL,
+//                        PortfolioDbContract.Trade.COLUMN_NAME_NAME,
+//                        PortfolioDbContract.Trade.COLUMN_NAME_POSITION,
+//                        PortfolioDbContract.Trade.COLUMN_NAME_PRICE,
+//                        PortfolioDbContract.Trade._ID
+//                },
                 null, null, null, null, null);
+    }
+
+    /**
+     * Return a Cursor over the list of all unique symbols in the portfolio
+     *
+     * @return Cursor over all symbols
+     */
+    public Cursor fetchAllSymbols() {
+        return mDb.query(
+                true, // distinct
+                PortfolioDbContract.Trade.TABLE_NAME,
+                new String[] { PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL },
+                null, null, null, null, null,null);
     }
 
     /**
@@ -146,7 +195,7 @@ public class PortfolioDbAdapter {
     }
 
     /**
-     * Update the trade using the details provided. The trade to be updated is
+     * Update static trade info using the details provided. The trade to be updated is
      * specified using the rowId, and it is altered to use the position
      * value passed in
      *
@@ -154,7 +203,7 @@ public class PortfolioDbAdapter {
      * @param position position to set on trade
      * @return true if the trade was successfully updated, false otherwise
      */
-    public boolean updateTrade(long rowId, int position) {
+    public boolean updateTradeStatic(long rowId, int position) {
         ContentValues args = new ContentValues();
         args.put(PortfolioDbContract.Trade.COLUMN_NAME_POSITION, position);
 
@@ -162,6 +211,26 @@ public class PortfolioDbAdapter {
                 PortfolioDbContract.Trade.TABLE_NAME,
                 args,
                 PortfolioDbContract.Trade._ID + "=" + rowId,
+                null) > 0;
+    }
+
+    /**
+     * Update dynamic trade info (price data ...) using the details provided.
+     * The trade to be updated is specified using the symbol, and it is altered to use the
+     * market data passed in
+     *
+     * @param symbol symbol of trade to update
+     * @param price price to set on trade
+     * @return true if the trade was successfully updated, false otherwise
+     */
+    public boolean updateTradeDynamic(String symbol, double price) {
+        ContentValues args = new ContentValues();
+        args.put(PortfolioDbContract.Trade.COLUMN_NAME_PRICE, price);
+
+        return mDb.update(
+                PortfolioDbContract.Trade.TABLE_NAME,
+                args,
+                PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL + "='" + symbol + "'",
                 null) > 0;
     }
 
