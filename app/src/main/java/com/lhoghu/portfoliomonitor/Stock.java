@@ -1,4 +1,4 @@
-package com.lhoghu.yahoointerface;
+package com.lhoghu.portfoliomonitor;
 
 import java.util.List;
 
