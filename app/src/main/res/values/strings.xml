@@ -23,6 +23,9 @@
     <string name="portfolio_currency">Ccy</string>
     <string name="portfolio_position">Position</string>
     <string name="portfolio_price">Price</string>
+    <string name="portfolio_change">Change</string>
+    <string name="portfolio_pctchange">(%)</string>
+    <string name="portfolio_volume">Vol</string>
 
     <string name="portfolio_item_edit">Edit</string>
     <string name="portfolio_item_details">Chart</string>

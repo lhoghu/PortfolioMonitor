@@ -6,13 +6,24 @@ public class Stock {
     public final String symbol;
     public final String name;
     public final double price;
+    public final double change;
+    public final double pctChange;
+    public final double volume;
     public final double position;
     public final long id;
 
-    public Stock(String symbol, String name, double price) {
+    public Stock(
+            String symbol,
+            String name,
+            double last,
+            double change,
+            double volume) {
         this.symbol = symbol;
         this.name = name;
-        this.price = price;
+        this.price = last;
+        this.change = change;
+        this.pctChange = 100.0 * change / price;
+        this.volume = volume;
         this.position = 0.0;
         this.id = 0;
     }

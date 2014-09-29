@@ -19,7 +19,7 @@
         android:id="@+id/portfolio_name_header"
         android:text="@string/portfolio_name"
         android:layout_width="0dip"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
         android:textColor="#ff000000">
@@ -45,6 +45,33 @@
     <TextView
         android:id="@+id/portfolio_price_header"
         android:text="@string/portfolio_price"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff000000">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_change_header"
+        android:text="@string/portfolio_change"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff000000">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_pctchange_header"
+        android:text="@string/portfolio_pctchange"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff000000">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_volume_header"
+        android:text="@string/portfolio_volume"
         android:layout_width="0dip"
         android:layout_weight="1"
         android:layout_height="wrap_content"

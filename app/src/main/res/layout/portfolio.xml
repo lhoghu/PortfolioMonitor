@@ -17,7 +17,7 @@
     <TextView
         android:id="@+id/portfolio_name"
         android:layout_width="0dip"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
         android:textColor="#ff75797b">
@@ -40,6 +40,30 @@
     </TextView>
     <TextView
         android:id="@+id/portfolio_price"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff39df00">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_change"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff39df00">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_pctchange"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff39df00">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_volume"
         android:layout_width="0dip"
         android:layout_weight="1"
         android:layout_height="wrap_content"

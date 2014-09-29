@@ -19,7 +19,7 @@ import java.util.List;
 
 public class YahooParser extends AsyncTask<String, Integer, Stock[]> {
 
-    private static final String baseQuoteUrl = "http://finance.yahoo.com/d/quotes.csv?f=sb2n&s=";
+    private static final String baseQuoteUrl = "http://finance.yahoo.com/d/quotes.csv?f=snl1c6v&s=";
     private ProgressDialog pd;
     Context context;
 
@@ -39,8 +39,10 @@ public class YahooParser extends AsyncTask<String, Integer, Stock[]> {
                 String[] values = line.split(",");
                 Stock stock = new Stock(
                         stripQuotes(values[0]),
-                        stripQuotes(values[2]),
-                        Double.parseDouble(values[1]));
+                        stripQuotes(values[1]),
+                        Double.parseDouble(stripQuotes(values[2])),
+                        Double.parseDouble(stripQuotes(values[3])),
+                        Double.parseDouble(stripQuotes(values[4])));
                 stocks.add(stock);
                 line = reader.readLine();
             }

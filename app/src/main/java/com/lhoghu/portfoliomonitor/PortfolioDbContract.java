@@ -8,7 +8,7 @@ public final class PortfolioDbContract {
     public PortfolioDbContract() {}
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "Portfolio.db";
 
     private static final String TEXT_TYPE = " TEXT";
@@ -25,6 +25,9 @@ public final class PortfolioDbContract {
         public static final String COLUMN_NAME_POSITION = "position";
         public static final String COLUMN_NAME_CURRENCY = "currency";
         public static final String COLUMN_NAME_PRICE = "price";
+        public static final String COLUMN_NAME_CHANGE = "change";
+        public static final String COLUMN_NAME_PCTCHANGE = "pctchange";
+        public static final String COLUMN_NAME_VOLUME = "volume";
 
         public static final String SQL_CREATE_ENTRIES =
                 "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
@@ -33,7 +36,10 @@ public final class PortfolioDbContract {
                         Trade.COLUMN_NAME_NAME + TEXT_TYPE + COMMA_SEP +
                         Trade.COLUMN_NAME_CURRENCY + TEXT_TYPE + COMMA_SEP +
                         Trade.COLUMN_NAME_POSITION + REAL_TYPE + COMMA_SEP +
-                        Trade.COLUMN_NAME_PRICE + REAL_TYPE +
+                        Trade.COLUMN_NAME_PRICE + REAL_TYPE + COMMA_SEP +
+                        Trade.COLUMN_NAME_CHANGE + REAL_TYPE + COMMA_SEP +
+                        Trade.COLUMN_NAME_PCTCHANGE + REAL_TYPE + COMMA_SEP +
+                        Trade.COLUMN_NAME_VOLUME + REAL_TYPE +
                         " )";
 
         public static final String SQL_DELETE_ENTRIES =

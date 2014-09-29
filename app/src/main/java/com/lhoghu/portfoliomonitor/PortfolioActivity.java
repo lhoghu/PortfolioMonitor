@@ -37,7 +37,10 @@ public class PortfolioActivity extends Activity {
                 PortfolioDbContract.Trade.COLUMN_NAME_NAME,
                 PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY,
                 PortfolioDbContract.Trade.COLUMN_NAME_POSITION,
-                PortfolioDbContract.Trade.COLUMN_NAME_PRICE
+                PortfolioDbContract.Trade.COLUMN_NAME_PRICE,
+                PortfolioDbContract.Trade.COLUMN_NAME_CHANGE,
+                PortfolioDbContract.Trade.COLUMN_NAME_PCTCHANGE,
+                PortfolioDbContract.Trade.COLUMN_NAME_VOLUME
         };
 
         int[] layoutCols = new int[]{
@@ -45,7 +48,10 @@ public class PortfolioActivity extends Activity {
                 R.id.portfolio_name,
                 R.id.portfolio_currency,
                 R.id.portfolio_position,
-                R.id.portfolio_price
+                R.id.portfolio_price,
+                R.id.portfolio_change,
+                R.id.portfolio_pctchange,
+                R.id.portfolio_volume
         };
 
         ListView listView = (ListView) findViewById(R.id.portfolio);
@@ -146,7 +152,8 @@ public class PortfolioActivity extends Activity {
             parser.execute(symbols);
             Stock[] stocks = parser.get();
             for (Stock stock : stocks) {
-                dbAdapter.updateTradeDynamic(stock.symbol, stock.price);
+                dbAdapter.updateTradeDynamic(
+                        stock.symbol, stock.price, stock.change, stock.pctChange, stock.volume);
             }
         } catch (Exception e) {
             Toast.makeText(PortfolioActivity.this, "Failed to update stock data", Toast.LENGTH_SHORT).show();

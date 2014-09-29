@@ -223,9 +223,17 @@ public class PortfolioDbAdapter {
      * @param price price to set on trade
      * @return true if the trade was successfully updated, false otherwise
      */
-    public boolean updateTradeDynamic(String symbol, double price) {
+    public boolean updateTradeDynamic(
+            String symbol,
+            double price,
+            double change,
+            double pctChange,
+            double volume) {
         ContentValues args = new ContentValues();
         args.put(PortfolioDbContract.Trade.COLUMN_NAME_PRICE, price);
+        args.put(PortfolioDbContract.Trade.COLUMN_NAME_CHANGE, change);
+        args.put(PortfolioDbContract.Trade.COLUMN_NAME_PCTCHANGE, pctChange);
+        args.put(PortfolioDbContract.Trade.COLUMN_NAME_VOLUME, volume);
 
         return mDb.update(
                 PortfolioDbContract.Trade.TABLE_NAME,
