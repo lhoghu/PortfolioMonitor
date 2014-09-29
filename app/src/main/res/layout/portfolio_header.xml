@@ -25,6 +25,15 @@
         android:textColor="#ff000000">
     </TextView>
     <TextView
+        android:id="@+id/portfolio_currency_header"
+        android:text="@string/portfolio_currency"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff000000">
+    </TextView>
+    <TextView
         android:id="@+id/portfolio_position_header"
         android:text="@string/portfolio_position"
         android:layout_width="0dip"

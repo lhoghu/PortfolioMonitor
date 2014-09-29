@@ -53,11 +53,13 @@ public class PortfolioDbAdapter {
                     "INSERT INTO " + PortfolioDbContract.Trade.TABLE_NAME + " (" +
                             PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL + ", " +
                             PortfolioDbContract.Trade.COLUMN_NAME_NAME + ", " +
+                            PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY + ", " +
                             PortfolioDbContract.Trade.COLUMN_NAME_POSITION + ") " +
 
                     "SELECT " +
                             PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL + ", " +
                             PortfolioDbContract.Trade.COLUMN_NAME_NAME + ", " +
+                            PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY + ", " +
                             PortfolioDbContract.Trade.COLUMN_NAME_POSITION +
                     " FROM " + backupName(PortfolioDbContract.Trade.TABLE_NAME) + ";"
             );
@@ -114,11 +116,12 @@ public class PortfolioDbAdapter {
      * @param name the yahoo name associated with the symbol
      * @return rowId or -1 if failed
      */
-    public long addSymbol(String symbol, String name, int position) {
+    public long addSymbol(String symbol, String name, String currency, int position) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL, symbol);
         initialValues.put(PortfolioDbContract.Trade.COLUMN_NAME_NAME, name);
         initialValues.put(PortfolioDbContract.Trade.COLUMN_NAME_POSITION, position);
+        initialValues.put(PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY, currency);
 
         return mDb.insert(PortfolioDbContract.Trade.TABLE_NAME, null, initialValues);
     }
@@ -179,11 +182,7 @@ public class PortfolioDbAdapter {
         Cursor mCursor = mDb.query(
                 true,
                 PortfolioDbContract.Trade.TABLE_NAME,
-                new String[] {
-                        PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL,
-                        PortfolioDbContract.Trade.COLUMN_NAME_NAME,
-                        PortfolioDbContract.Trade.COLUMN_NAME_POSITION,
-                        PortfolioDbContract.Trade._ID},
+                null, // retrieve all columns - might be better to pass in the columns we want...
                 PortfolioDbContract.Trade._ID + "=" + rowId,
                 null, null, null, null, null);
 
@@ -203,8 +202,9 @@ public class PortfolioDbAdapter {
      * @param position position to set on trade
      * @return true if the trade was successfully updated, false otherwise
      */
-    public boolean updateTradeStatic(long rowId, int position) {
+    public boolean updateTradeStatic(long rowId, String currency, int position) {
         ContentValues args = new ContentValues();
+        args.put(PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY, currency);
         args.put(PortfolioDbContract.Trade.COLUMN_NAME_POSITION, position);
 
         return mDb.update(

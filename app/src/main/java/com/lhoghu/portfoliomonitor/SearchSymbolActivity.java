@@ -61,9 +61,9 @@ public class SearchSymbolActivity extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -75,65 +75,9 @@ public class SearchSymbolActivity extends Activity {
      */
     public void buttonAddSymbolHandler(View view)
     {
-        LayoutInflater li = LayoutInflater.from(this);
-        View dialogView = li.inflate(R.layout.add_symbol_dialog, null);
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setView(dialogView);
-
-        final EditText userInput = (EditText) dialogView.findViewById(R.id.position_user_input);
-        final View v = view;
-        final Context context = this;
-
-        // set dialog message
-        alertDialogBuilder
-                .setCancelable(false)
-                .setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // Get the row the button is clicked in
-                                LinearLayout parentRow = (LinearLayout) v.getParent();
-
-                                TextView symbol = (TextView) parentRow.getChildAt(0);
-                                TextView name = (TextView) parentRow.getChildAt(1);
-                                TextView price = (TextView) parentRow.getChildAt(2);
-
-                                int position = Long.valueOf(userInput.getText().toString()).intValue();
-
-                                PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(context);
-                                dbAdapter.open();
-                                long success = dbAdapter.addSymbol(
-                                        symbol.getText().toString(),
-                                        name.getText().toString(),
-                                        position);
-                                if (success != -1) {
-                                    dbAdapter.updateTradeDynamic(
-                                            symbol.getText().toString(),
-                                            Double.valueOf(price.getText().toString()));
-                                }
-                                dbAdapter.close();
-
-                                if (success == -1)
-                                    Toast.makeText(
-                                            getApplicationContext(),
-                                            "Failed to add " + symbol.getText().toString() + " to portfolio",
-                                            Toast.LENGTH_SHORT).show();
-                                else
-                                    Toast.makeText(
-                                            getApplicationContext(),
-                                            "Added " + symbol.getText().toString() + " to portfolio",
-                                            Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+        UpdateSymbol update = new NewSymbol(SearchSymbolActivity.this, view);
+        TradeInputDialog dialog = new TradeInputDialog(SearchSymbolActivity.this, update);
+        dialog.create();
     }
 
     /**
@@ -177,6 +121,65 @@ public class SearchSymbolActivity extends Activity {
             }
 
             return view;
+        }
+    }
+
+    /**
+     * Extend UpdateSymbol for cases where we want to add a new symbol to the db with
+     * an associated currency and position
+     */
+    public class NewSymbol extends UpdateSymbol {
+
+        private String symbol;
+        private String name;
+        private Context context;
+
+        /**
+         * Use a view to read the symbol/name information of the trade we're adding to the db
+         *
+         * @param context The context used to instantiate the db
+         * @param view The view that contains the symbol/name trade information
+         */
+        public NewSymbol(Context context, View view) {
+            this.context = context;
+            setMembersFromView(view);
+        }
+
+        public long update(String currency, int position) {
+            // Create a new entry in the db for the symbol, along with the supplied
+            // currency position info
+            PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(context);
+            dbAdapter.open();
+            long success = dbAdapter.addSymbol(symbol, name, currency, position);
+            dbAdapter.close();
+
+            return success;
+        }
+
+        @Override
+        public void onCompleted(long success) {
+            if (success == -1)
+                Toast.makeText(
+                        context,
+                        "Failed to update " + symbol + " in portfolio",
+                        Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(
+                        context,
+                        "Updated " + symbol + " in portfolio",
+                        Toast.LENGTH_SHORT).show();
+        }
+
+        private void setMembersFromView(View view) {
+            // Get the row the button is clicked in
+            LinearLayout parentRow = (LinearLayout) view.getParent();
+
+            // Read the symbol/name from the view
+            TextView symbolTextView = (TextView) parentRow.getChildAt(0);
+            TextView nameTextView = (TextView) parentRow.getChildAt(1);
+
+            symbol = symbolTextView.getText().toString();
+            name = nameTextView.getText().toString();
         }
     }
 }

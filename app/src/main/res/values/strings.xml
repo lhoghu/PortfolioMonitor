@@ -13,10 +13,14 @@
     <string name="ok">OK</string>
     <string name="sim_behaviour_dialog">Pretending to perform action:</string>
     <string name="yahoo_download_dialog">Downloading from Yahoo</string>
+    <string name="currency">Trade currency</string>
+    <string name="currency_hint">Enter currency</string>
+    <string name="position">Trade position</string>
     <string name="position_hint">Enter position</string>
 
     <string name="portfolio_symbol">Symbol</string>
     <string name="portfolio_name">Name</string>
+    <string name="portfolio_currency">Ccy</string>
     <string name="portfolio_position">Position</string>
     <string name="portfolio_price">Price</string>
 

@@ -1,6 +1,8 @@
 package com.lhoghu.portfoliomonitor;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -10,6 +12,7 @@ import android.view.MenuItem;
 import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -32,6 +35,7 @@ public class PortfolioActivity extends Activity {
         String[] dbCols = new String[]{
                 PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL,
                 PortfolioDbContract.Trade.COLUMN_NAME_NAME,
+                PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY,
                 PortfolioDbContract.Trade.COLUMN_NAME_POSITION,
                 PortfolioDbContract.Trade.COLUMN_NAME_PRICE
         };
@@ -39,6 +43,7 @@ public class PortfolioActivity extends Activity {
         int[] layoutCols = new int[]{
                 R.id.portfolio_symbol,
                 R.id.portfolio_name,
+                R.id.portfolio_currency,
                 R.id.portfolio_position,
                 R.id.portfolio_price
         };
@@ -68,20 +73,15 @@ public class PortfolioActivity extends Activity {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.portfolio_item_edit:
-                // pass info.id to a method that edits the item
-                Toast.makeText(this, "Pretend to edit item", Toast.LENGTH_SHORT).show();
+                editPortfolioItem(info.position);
                 return true;
 
             case R.id.portfolio_item_details:
-                Toast.makeText(this, "Pretend to show item detail", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
                 return true;
 
             case R.id.portfolio_item_delete:
-                Cursor c = portfolioAdapter.getCursor();
-                c.moveToPosition(info.position - 1);
-                long tradeId = c.getLong(c.getColumnIndex(PortfolioDbContract.Trade._ID));
-                dbAdapter.deleteEntry(tradeId);
-                invalidateCursor(c);
+                deletePortfolioItem(info.position);
                 return true;
 
             default:
@@ -152,5 +152,86 @@ public class PortfolioActivity extends Activity {
             Toast.makeText(PortfolioActivity.this, "Failed to update stock data", Toast.LENGTH_SHORT).show();
         }
         invalidateCursor(cursor);
+    }
+
+    private long getIdFromPosition(int pos) {
+        // Get the id of the db row that corresponds to the user-clicked position in the portfolio view
+        Cursor c = portfolioAdapter.getCursor();
+        c.moveToPosition(pos - 1);
+        return c.getLong(c.getColumnIndex(PortfolioDbContract.Trade._ID));
+    }
+
+    private void deletePortfolioItem(int pos) {
+        long tradeId = getIdFromPosition(pos);
+
+        // Delete the trade id from the db
+        dbAdapter.deleteEntry(tradeId);
+
+        // Reset the cursor on the view adapter to trigger a redraw
+        invalidateCursor(portfolioAdapter.getCursor());
+    }
+
+    private void editPortfolioItem(int pos) {
+        long tradeId = getIdFromPosition(pos);
+
+        // Open the dialog that allows the user to set trade static data
+        UpdateSymbol updater = new ExistingSymbol(tradeId);
+        TradeInputDialog dialog = new TradeInputDialog(PortfolioActivity.this, updater);
+        dialog.create();
+
+        // Use onCompleted method on ExistingSymbol to trigger the redraw after the db's
+        // been updated
+    }
+
+    // Extend the UpdateSymbol class so we can use the TradeInputDialog to edit the
+    // user defined trade data on the existing symbol
+    private class ExistingSymbol extends UpdateSymbol {
+
+        private long id;
+
+        public ExistingSymbol(long id) {
+            this.id = id;
+        }
+
+        public long update(String currency, int position) {
+
+            boolean success = dbAdapter.updateTradeStatic(id, currency, position);
+
+            if (!success)
+                return -1;
+
+            return id;
+        }
+
+        @Override
+        public void overrideHintText(EditText currencyView, EditText positionView) {
+            Cursor c = dbAdapter.fetchTrade(id);
+            String currency = c.getString(c.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY));
+            String position = c.getString(c.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_POSITION));
+            c.close();
+
+            if (currency != null && !currency.isEmpty()) currencyView.setText(currency);
+            if (position != null && !position.isEmpty()) positionView.setText(position);
+        }
+
+        @Override
+        public void onCompleted(long success) {
+            if (success == -1)
+                Toast.makeText(
+                        PortfolioActivity.this,
+                        "Failed to update " + getSymbol() + " in portfolio",
+                        Toast.LENGTH_SHORT).show();
+
+            // Reset the cursor on the view adapter to trigger a redraw
+            invalidateCursor(portfolioAdapter.getCursor());
+        }
+
+        private String getSymbol() {
+            Cursor c = dbAdapter.fetchTrade(id);
+            String symbol = c.getString(c.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL));
+            c.close();
+
+            return symbol;
+        }
     }
 }
