@@ -17,13 +17,16 @@
     <string name="currency_hint">Enter currency</string>
     <string name="position">Trade position</string>
     <string name="position_hint">Enter position</string>
+    <string name="boughtat">Bought at</string>
+    <string name="boughtat_hint">Enter value bought at</string>
 
-    <string name="portfolio_symbol">Symbol</string>
-    <string name="portfolio_name">Name</string>
+    <!--<string name="portfolio_symbol">Symbol</string>-->
+    <!--<string name="portfolio_name">Name</string>-->
     <string name="portfolio_currency">Ccy</string>
-    <string name="portfolio_position">Position</string>
+    <string name="portfolio_position">Units</string>
+    <string name="portfolio_boughtat">\@</string>
     <string name="portfolio_price">Price</string>
-    <string name="portfolio_change">Change</string>
+    <string name="portfolio_change">Chg</string>
     <string name="portfolio_pctchange">(%)</string>
     <string name="portfolio_volume">Vol</string>
 

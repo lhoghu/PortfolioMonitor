@@ -36,9 +36,19 @@ public class PortfolioDbAdapter {
 
             Log.i("Portfolio Monitor", "Upgrading db from version " + String.valueOf(oldVersion));
 
-            /**
-             * Upgrade for version 1 to version 2
-             */
+            if (oldVersion < 5)
+                upgradeToVersion5(db);
+        }
+
+        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            onUpgrade(db, oldVersion, newVersion);
+        }
+
+        private String backupName(String tableName) {
+            return tableName + "_backup";
+        }
+
+        private void upgradeToVersion5(SQLiteDatabase db) {
             // Backup existing tables
             db.execSQL(
                     "ALTER TABLE " + PortfolioDbContract.Trade.TABLE_NAME +
@@ -54,26 +64,20 @@ public class PortfolioDbAdapter {
                             PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL + ", " +
                             PortfolioDbContract.Trade.COLUMN_NAME_NAME + ", " +
                             PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY + ", " +
+                            PortfolioDbContract.Trade.COLUMN_NAME_BOUGHTAT + ", " +
                             PortfolioDbContract.Trade.COLUMN_NAME_POSITION + ") " +
 
-                    "SELECT " +
+                            "SELECT " +
                             PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL + ", " +
                             PortfolioDbContract.Trade.COLUMN_NAME_NAME + ", " +
                             PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY + ", " +
+                            PortfolioDbContract.Trade.COLUMN_NAME_BOUGHTAT + ", " +
                             PortfolioDbContract.Trade.COLUMN_NAME_POSITION +
-                    " FROM " + backupName(PortfolioDbContract.Trade.TABLE_NAME) + ";"
+                            " FROM " + backupName(PortfolioDbContract.Trade.TABLE_NAME) + ";"
             );
 
             // Remove the backup
             db.execSQL("DROP TABLE " + backupName(PortfolioDbContract.Trade.TABLE_NAME) + ";");
-        }
-
-        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            onUpgrade(db, oldVersion, newVersion);
-        }
-
-        private String backupName(String tableName) {
-            return tableName + "_backup";
         }
     }
 
@@ -116,12 +120,13 @@ public class PortfolioDbAdapter {
      * @param name the yahoo name associated with the symbol
      * @return rowId or -1 if failed
      */
-    public long addSymbol(String symbol, String name, String currency, int position) {
+    public long addSymbol(String symbol, String name, String currency, int position, Double boughtAt) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(PortfolioDbContract.Trade.COLUMN_NAME_SYMBOL, symbol);
         initialValues.put(PortfolioDbContract.Trade.COLUMN_NAME_NAME, name);
         initialValues.put(PortfolioDbContract.Trade.COLUMN_NAME_POSITION, position);
         initialValues.put(PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY, currency);
+        initialValues.put(PortfolioDbContract.Trade.COLUMN_NAME_BOUGHTAT, boughtAt);
 
         return mDb.insert(PortfolioDbContract.Trade.TABLE_NAME, null, initialValues);
     }
@@ -202,10 +207,11 @@ public class PortfolioDbAdapter {
      * @param position position to set on trade
      * @return true if the trade was successfully updated, false otherwise
      */
-    public boolean updateTradeStatic(long rowId, String currency, int position) {
+    public boolean updateTradeStatic(long rowId, String currency, int position, Double boughtAt) {
         ContentValues args = new ContentValues();
         args.put(PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY, currency);
         args.put(PortfolioDbContract.Trade.COLUMN_NAME_POSITION, position);
+        args.put(PortfolioDbContract.Trade.COLUMN_NAME_BOUGHTAT, boughtAt);
 
         return mDb.update(
                 PortfolioDbContract.Trade.TABLE_NAME,

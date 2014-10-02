@@ -26,8 +26,9 @@ public class TradeInputDialog {
 
         final EditText currencyUserInput = (EditText) dialogView.findViewById(R.id.currency_user_input);
         final EditText positionUserInput = (EditText) dialogView.findViewById(R.id.position_user_input);
+        final EditText boughtAtUserInput = (EditText) dialogView.findViewById(R.id.boughtat_user_input);
 
-        updateSymbol.overrideHintText(currencyUserInput, positionUserInput);
+        updateSymbol.overrideHintText(currencyUserInput, positionUserInput, boughtAtUserInput);
 
         alertDialogBuilder
                 .setCancelable(false)
@@ -38,11 +39,17 @@ public class TradeInputDialog {
                                 // Get user specified data from the dialog window
                                 String currency = currencyUserInput.getText().toString();
                                 String positionStr = positionUserInput.getText().toString();
+                                String boughtAtStr = boughtAtUserInput.getText().toString();
 
                                 int position = 0;
                                 if (!positionStr.isEmpty())
                                     position = Long.valueOf(positionStr).intValue();
-                                long success = updateSymbol.update(currency, position);
+
+                                Double boughtAt = null;
+                                if (!boughtAtStr.isEmpty())
+                                    boughtAt = Double.valueOf(boughtAtStr);
+
+                                long success = updateSymbol.update(currency, position, boughtAt);
 
                                 updateSymbol.onCompleted(success);
                             }

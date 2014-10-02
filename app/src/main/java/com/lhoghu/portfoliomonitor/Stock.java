@@ -5,19 +5,19 @@ import java.util.List;
 public class Stock {
     public final String symbol;
     public final String name;
-    public final double price;
-    public final double change;
-    public final double pctChange;
-    public final double volume;
-    public final double position;
+    public final Double price;
+    public final Double change;
+    public final Double pctChange;
+    public final Double volume;
+    public final Double position;
     public final long id;
 
     public Stock(
             String symbol,
             String name,
-            double last,
-            double change,
-            double volume) {
+            Double last,
+            Double change,
+            Double volume) {
         this.symbol = symbol;
         this.name = name;
         this.price = last;

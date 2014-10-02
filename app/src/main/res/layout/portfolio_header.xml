@@ -8,7 +8,6 @@
 
     <TextView
         android:id="@+id/portfolio_symbol_header"
-        android:text="@string/portfolio_symbol"
         android:layout_width="0dip"
         android:layout_weight="1"
         android:layout_height="wrap_content"
@@ -17,7 +16,6 @@
     </TextView>
     <TextView
         android:id="@+id/portfolio_name_header"
-        android:text="@string/portfolio_name"
         android:layout_width="0dip"
         android:layout_weight="2"
         android:layout_height="wrap_content"
@@ -36,6 +34,15 @@
     <TextView
         android:id="@+id/portfolio_position_header"
         android:text="@string/portfolio_position"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff000000">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_boughtat_header"
+        android:text="@string/portfolio_boughtat"
         android:layout_width="0dip"
         android:layout_weight="1"
         android:layout_height="wrap_content"

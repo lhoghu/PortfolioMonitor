@@ -36,7 +36,15 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
-        android:textColor="#ff39df00">
+        android:textColor="#ff000000">
+    </TextView>
+    <TextView
+        android:id="@+id/portfolio_boughtat"
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ff000000">
     </TextView>
     <TextView
         android:id="@+id/portfolio_price"
@@ -68,6 +76,6 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
-        android:textColor="#ff39df00">
+        android:textColor="#ff000000">
     </TextView>
 </LinearLayout>

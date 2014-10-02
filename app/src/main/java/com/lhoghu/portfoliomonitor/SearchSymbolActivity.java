@@ -1,9 +1,7 @@
 package com.lhoghu.portfoliomonitor;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,7 +72,7 @@ public class SearchSymbolActivity extends Activity {
      */
     public void buttonAddSymbolHandler(View view)
     {
-        UpdateSymbol update = new NewSymbol(SearchSymbolActivity.this, view);
+        UpdateSymbol update = new NewSymbol(SearchSymbolActivity.this);
         TradeInputDialog dialog = new TradeInputDialog(SearchSymbolActivity.this, update);
         dialog.create();
     }
@@ -108,19 +105,23 @@ public class SearchSymbolActivity extends Activity {
                 TextView symbol = (TextView) view.findViewById(R.id.symbol_search_result);
                 TextView name   = (TextView) view.findViewById(R.id.symbol_search_name);
                 TextView price  = (TextView) view.findViewById(R.id.symbol_search_price);
+                TextView change  = (TextView) view.findViewById(R.id.symbol_search_change);
+                TextView volume = (TextView) view.findViewById(R.id.symbol_search_volume);
 
-                if (symbol != null) {
-                    symbol.setText(stock.symbol);
-                }
-                if (name != null) {
-                    name.setText(stock.name);
-                }
-                if (price != null) {
-                    price.setText(String.valueOf(stock.price));
-                }
+                setIfNotNull(symbol, stock.symbol);
+                setIfNotNull(name, stock.name);
+                setIfNotNull(price, String.valueOf(stock.price));
+                setIfNotNull(change, String.valueOf(stock.change));
+                setIfNotNull(volume, String.valueOf(stock.volume));
             }
 
             return view;
+        }
+
+        private void setIfNotNull(TextView view, String text) {
+            if (view != null) {
+                view.setText(text);
+            }
         }
     }
 
@@ -138,19 +139,18 @@ public class SearchSymbolActivity extends Activity {
          * Use a view to read the symbol/name information of the trade we're adding to the db
          *
          * @param context The context used to instantiate the db
-         * @param view The view that contains the symbol/name trade information
          */
-        public NewSymbol(Context context, View view) {
+        public NewSymbol(Context context) {
             this.context = context;
-            setMembersFromView(view);
+            setMembersFromView();
         }
 
-        public long update(String currency, int position) {
+        public long update(String currency, int position, Double boughtAt) {
             // Create a new entry in the db for the symbol, along with the supplied
             // currency position info
             PortfolioDbAdapter dbAdapter = new PortfolioDbAdapter(context);
             dbAdapter.open();
-            long success = dbAdapter.addSymbol(symbol, name, currency, position);
+            long success = dbAdapter.addSymbol(symbol, name, currency, position, boughtAt);
             dbAdapter.close();
 
             return success;
@@ -170,13 +170,9 @@ public class SearchSymbolActivity extends Activity {
                         Toast.LENGTH_SHORT).show();
         }
 
-        private void setMembersFromView(View view) {
-            // Get the row the button is clicked in
-            LinearLayout parentRow = (LinearLayout) view.getParent();
-
-            // Read the symbol/name from the view
-            TextView symbolTextView = (TextView) parentRow.getChildAt(0);
-            TextView nameTextView = (TextView) parentRow.getChildAt(1);
+        private void setMembersFromView() {
+            TextView symbolTextView = (TextView) findViewById(R.id.symbol_search_result);
+            TextView nameTextView   = (TextView) findViewById(R.id.symbol_search_name);
 
             symbol = symbolTextView.getText().toString();
             name = nameTextView.getText().toString();

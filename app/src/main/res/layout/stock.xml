@@ -26,11 +26,19 @@
         android:layout_margin="5dip"
         android:textColor="#ffaf6c00">
     </TextView>
-    <Button android:text="Add"
-        android:id="@+id/button_add_symbol"
+    <TextView
+        android:id="@+id/symbol_search_change"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="buttonAddSymbolHandler">
-    </Button>
+        android:layout_margin="5dip"
+        android:textColor="#ffaf6c00">
+    </TextView>
+    <TextView
+        android:id="@+id/symbol_search_volume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dip"
+        android:textColor="#ffaf6c00">
+    </TextView>
 
 </LinearLayout>

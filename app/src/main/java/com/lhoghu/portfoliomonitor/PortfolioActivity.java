@@ -1,8 +1,6 @@
 package com.lhoghu.portfoliomonitor;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -37,6 +35,7 @@ public class PortfolioActivity extends Activity {
                 PortfolioDbContract.Trade.COLUMN_NAME_NAME,
                 PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY,
                 PortfolioDbContract.Trade.COLUMN_NAME_POSITION,
+                PortfolioDbContract.Trade.COLUMN_NAME_BOUGHTAT,
                 PortfolioDbContract.Trade.COLUMN_NAME_PRICE,
                 PortfolioDbContract.Trade.COLUMN_NAME_CHANGE,
                 PortfolioDbContract.Trade.COLUMN_NAME_PCTCHANGE,
@@ -48,6 +47,7 @@ public class PortfolioActivity extends Activity {
                 R.id.portfolio_name,
                 R.id.portfolio_currency,
                 R.id.portfolio_position,
+                R.id.portfolio_boughtat,
                 R.id.portfolio_price,
                 R.id.portfolio_change,
                 R.id.portfolio_pctchange,
@@ -200,9 +200,9 @@ public class PortfolioActivity extends Activity {
             this.id = id;
         }
 
-        public long update(String currency, int position) {
+        public long update(String currency, int position, Double boughtAt) {
 
-            boolean success = dbAdapter.updateTradeStatic(id, currency, position);
+            boolean success = dbAdapter.updateTradeStatic(id, currency, position, boughtAt);
 
             if (!success)
                 return -1;
@@ -211,14 +211,19 @@ public class PortfolioActivity extends Activity {
         }
 
         @Override
-        public void overrideHintText(EditText currencyView, EditText positionView) {
+        public void overrideHintText(
+                EditText currencyView,
+                EditText positionView,
+                EditText boughtAtView) {
             Cursor c = dbAdapter.fetchTrade(id);
             String currency = c.getString(c.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_CURRENCY));
             String position = c.getString(c.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_POSITION));
+            String boughtAt = c.getString(c.getColumnIndex(PortfolioDbContract.Trade.COLUMN_NAME_BOUGHTAT));
             c.close();
 
             if (currency != null && !currency.isEmpty()) currencyView.setText(currency);
             if (position != null && !position.isEmpty()) positionView.setText(position);
+            if (boughtAt != null && !boughtAt.isEmpty()) boughtAtView.setText(boughtAt);
         }
 
         @Override

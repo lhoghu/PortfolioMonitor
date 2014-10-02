@@ -28,15 +28,21 @@
             android:id="@+id/symbol_search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_search"
-            android:onClick="searchSymbol" />
+            android:text="@string/button_search" />
     </LinearLayout>
 
     <ListView
         android:id="@+id/symbol_list"
-        android:layout_height="fill_parent"
+        android:layout_height="0dp"
         android:layout_width="fill_parent"
         android:layout_weight="1">
     </ListView>
+
+    <Button android:text="Add"
+        android:id="@+id/button_add_symbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="buttonAddSymbolHandler">
+    </Button>
 
 </LinearLayout>
