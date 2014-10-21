@@ -3,13 +3,15 @@ package com.lhoghu.portfoliomonitor;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,26 +24,60 @@ public class SearchSymbolActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_symbol);
 
-        final Button searchButton = (Button) findViewById(R.id.symbol_search_button);
-        searchButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                final EditText input = (EditText) findViewById(R.id.symbol_search);
-                String symbol = input.getText().toString();
-                try {
-                    YahooParser parser = new YahooParser(SearchSymbolActivity.this);
-                    parser.execute(symbol);
-                    Stock[] stocks = parser.get();
+        // Auto completion on the search box
+        final EditText textBox = (EditText) findViewById(R.id.symbol_search);
+        textBox.addTextChangedListener(new TextWatcher() {
 
-                    StockAdapter adapter =
-                            new StockAdapter(SearchSymbolActivity.this, R.layout.stock, stocks);
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+
+                String userInput = textBox.getText().toString();
+
+                try {
+                    YahooLookup lookup = new YahooLookup();
+                    lookup.execute(userInput);
+                    SearchResult[] searchResults = lookup.get();
+
+                    SearchResultAdapter adapter = new SearchResultAdapter(
+                            SearchSymbolActivity.this,
+                            R.layout.search_result,
+                            searchResults);
 
                     ListView listView = (ListView) findViewById(R.id.symbol_list);
                     listView.setAdapter(adapter);
+
                 } catch (Exception e) {
                     Toast.makeText(SearchSymbolActivity.this,
-                            "Failed to load stock " + symbol + " from Yahoo",
+                            "Failed to lookup symbol " + userInput + " from Yahoo",
                             Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        // Listener on the search results that adds symbols to the portfolio
+        final ListView searchResults = (ListView) findViewById(R.id.symbol_list);
+        searchResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long row) {
+                SearchResultAdapter adapter = (SearchResultAdapter) adapterView.getAdapter();
+                SearchResult result = adapter.searchResults[position];
+
+                UpdateSymbol update = new NewSymbol(SearchSymbolActivity.this, result.symbol, result.name);
+                TradeInputDialog dialog = new TradeInputDialog(SearchSymbolActivity.this, update);
+                dialog.create();
             }
         });
     }
@@ -66,27 +102,15 @@ public class SearchSymbolActivity extends Activity {
     }
 
     /**
-     * Handler for a button click event within each listview element.
-     * On click, a dialog window should appear that requests user information
-     * (position, currency, ...) before the symbol is saved to the portfolio db
-     */
-    public void buttonAddSymbolHandler(View view)
-    {
-        UpdateSymbol update = new NewSymbol(SearchSymbolActivity.this);
-        TradeInputDialog dialog = new TradeInputDialog(SearchSymbolActivity.this, update);
-        dialog.create();
-    }
-
-    /**
      * Class to populate symbol search results in a list view
      */
-    public class StockAdapter extends ArrayAdapter<Stock> {
+    public class SearchResultAdapter extends ArrayAdapter<SearchResult> {
 
-        private Stock[] stocks;
+        private SearchResult[] searchResults;
 
-        public StockAdapter(Context context, int textViewResourceId, Stock[] stocks) {
-            super(context, textViewResourceId, stocks);
-            this.stocks = stocks;
+        public SearchResultAdapter(Context context, int textViewResourceId, SearchResult[] searchResults) {
+            super(context, textViewResourceId, searchResults);
+            this.searchResults = searchResults;
         }
 
         @Override
@@ -96,23 +120,22 @@ public class SearchSymbolActivity extends Activity {
             // To inflate it means to render, or show, the view.
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.stock, null);
+                view = inflater.inflate(R.layout.search_result, null);
             }
 
-            Stock stock = stocks[position];
+            SearchResult searchResult = searchResults[position];
 
-            if (stock != null) {
+            if (searchResult != null) {
                 TextView symbol = (TextView) view.findViewById(R.id.symbol_search_result);
                 TextView name   = (TextView) view.findViewById(R.id.symbol_search_name);
-                TextView price  = (TextView) view.findViewById(R.id.symbol_search_price);
-                TextView change  = (TextView) view.findViewById(R.id.symbol_search_change);
-                TextView volume = (TextView) view.findViewById(R.id.symbol_search_volume);
+                TextView type  = (TextView) view.findViewById(R.id.symbol_search_type);
+                TextView exchange  = (TextView) view.findViewById(R.id.symbol_search_exchange);
 
-                setIfNotNull(symbol, stock.symbol);
-                setIfNotNull(name, stock.name);
-                setIfNotNull(price, String.valueOf(stock.price));
-                setIfNotNull(change, String.valueOf(stock.change));
-                setIfNotNull(volume, String.valueOf(stock.volume));
+
+                setIfNotNull(symbol, searchResult.symbol);
+                setIfNotNull(name, searchResult.name);
+                setIfNotNull(type, String.valueOf(searchResult.type));
+                setIfNotNull(exchange, String.valueOf(searchResult.exchange));
             }
 
             return view;
@@ -139,10 +162,13 @@ public class SearchSymbolActivity extends Activity {
          * Use a view to read the symbol/name information of the trade we're adding to the db
          *
          * @param context The context used to instantiate the db
+         * @param symbol The new symbol to be added to the db
+         * @param name The new name to be added to the db
          */
-        public NewSymbol(Context context) {
+        public NewSymbol(Context context, String symbol, String name) {
             this.context = context;
-            setMembersFromView();
+            this.symbol = symbol;
+            this.name = name;
         }
 
         public long update(String currency, int position, Double boughtAt) {
@@ -168,14 +194,6 @@ public class SearchSymbolActivity extends Activity {
                         context,
                         "Updated " + symbol + " in portfolio",
                         Toast.LENGTH_SHORT).show();
-        }
-
-        private void setMembersFromView() {
-            TextView symbolTextView = (TextView) findViewById(R.id.symbol_search_result);
-            TextView nameTextView   = (TextView) findViewById(R.id.symbol_search_name);
-
-            symbol = symbolTextView.getText().toString();
-            name = nameTextView.getText().toString();
         }
     }
 }

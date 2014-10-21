@@ -20,8 +20,6 @@
     <string name="boughtat">Bought at</string>
     <string name="boughtat_hint">Enter value bought at</string>
 
-    <!--<string name="portfolio_symbol">Symbol</string>-->
-    <!--<string name="portfolio_name">Name</string>-->
     <string name="portfolio_currency">Ccy</string>
     <string name="portfolio_position">Units</string>
     <string name="portfolio_boughtat">\@</string>
