@@ -1,6 +1,7 @@
 package com.lhoghu.portfoliomonitor;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -9,15 +10,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.content.Intent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.DecimalFormat;
 
 public class PortfolioActivity extends Activity {
 
-    private SimpleCursorAdapter portfolioAdapter;
+    private PortfolioAdapter portfolioAdapter;
     private PortfolioDbAdapter dbAdapter;
 
     @Override
@@ -59,7 +64,7 @@ public class PortfolioActivity extends Activity {
         View header = getLayoutInflater().inflate(R.layout.portfolio_header, null);
         listView.addHeaderView(header);
 
-        portfolioAdapter = new SimpleCursorAdapter(this, R.layout.portfolio, c, dbCols, layoutCols, 0);
+        portfolioAdapter = new PortfolioAdapter(this, R.layout.portfolio, c, dbCols, layoutCols, 0);
         listView.setAdapter(portfolioAdapter);
         registerForContextMenu(listView);
     }
@@ -188,6 +193,93 @@ public class PortfolioActivity extends Activity {
 
         // Use onCompleted method on ExistingSymbol to trigger the redraw after the db's
         // been updated
+    }
+
+    private class PortfolioAdapter extends CursorAdapter {
+
+        //LayoutInflater inflater;
+        int layout;
+        String[] dbColumns;
+        int[] layoutIndices;
+
+        DecimalFormat percent = new DecimalFormat("#.##%");
+        DecimalFormat decimal = new DecimalFormat("#.##");
+        DecimalFormat volume = new DecimalFormat("#,###");
+
+        public PortfolioAdapter(
+                Context context,
+                int layout,
+                Cursor c,
+                String[] from,
+                int[] to,
+                int flags) {
+            super(context, c, flags);
+
+            this.layout = layout;
+            this.dbColumns = from;
+            this.layoutIndices = to;
+
+            percent.setMinimumFractionDigits(2);
+            decimal.setMinimumFractionDigits(2);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+            return getLayoutInflater().inflate(layout, viewGroup, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+//              Alternate bg colour from row to row
+//            if(cursor.getPosition()%2==1) {
+//                view.setBackgroundColor(context.getResources().getColor(R.color.background_odd));
+//            }
+//            else {
+//                view.setBackgroundColor(context.getResources().getColor(R.color.background_even));
+//            }
+
+            int nbCols = dbColumns.length;
+            for (int i = 0; i < nbCols; ++i) {
+                TextView content = (TextView) view.findViewById(layoutIndices[i]);
+                String val = cursor.getString(cursor.getColumnIndex(dbColumns[i]));
+
+                val = applyFormats(layoutIndices[i], val, content);
+
+                content.setText(val);
+            }
+        }
+
+        private String applyFormats(int layoutIndex, String val, TextView content) {
+            switch (layoutIndex) {
+                case R.id.portfolio_price: {
+                    double dVal = Double.valueOf(val);
+                    return decimal.format(dVal);
+                }
+                case R.id.portfolio_change: {
+                    double dVal = Double.valueOf(val);
+                    colorDecimalFormats(dVal, content);
+                    return decimal.format(dVal);
+                }
+                case R.id.portfolio_pctchange: {
+                    double dVal = Double.valueOf(val);
+                    colorDecimalFormats(dVal, content);
+                    return percent.format(dVal / 100.0);
+                }
+                case R.id.portfolio_volume: {
+                    double dVal = Double.valueOf(val);
+                    return volume.format(dVal);
+                }
+                default: return val;
+            }
+        }
+
+        private void colorDecimalFormats(double val, TextView content) {
+            if (val < 0.0) {
+                content.setTextColor(getResources().getColor(R.color.red));
+            } else {
+                content.setTextColor(getResources().getColor(R.color.green));
+            }
+        }
     }
 
     // Extend the UpdateSymbol class so we can use the TradeInputDialog to edit the

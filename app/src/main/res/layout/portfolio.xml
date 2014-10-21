@@ -52,7 +52,7 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
-        android:textColor="#ff39df00">
+        android:textStyle="bold">
     </TextView>
     <TextView
         android:id="@+id/portfolio_change"
@@ -60,7 +60,7 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
-        android:textColor="#ff39df00">
+        android:textColor="#ff00ff00">
     </TextView>
     <TextView
         android:id="@+id/portfolio_pctchange"
@@ -68,14 +68,13 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"
-        android:textColor="#ff39df00">
+        android:textColor="#ff00ff00">
     </TextView>
     <TextView
         android:id="@+id/portfolio_volume"
         android:layout_width="0dip"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:layout_margin="5dip"
-        android:textColor="#ff000000">
+        android:layout_margin="5dip">
     </TextView>
 </LinearLayout>
