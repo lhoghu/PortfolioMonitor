@@ -195,9 +195,10 @@ public class PortfolioActivity extends Activity {
         // been updated
     }
 
+    // Class to apply formats to the output in the portfolio view, using the
+    // cursor returned by the db query
     private class PortfolioAdapter extends CursorAdapter {
 
-        //LayoutInflater inflater;
         int layout;
         String[] dbColumns;
         int[] layoutIndices;
